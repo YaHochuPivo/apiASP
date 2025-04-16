@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .nav {
+            background-color: #c19a6b;
+            padding: 15px 0;
+            margin-bottom: 20px;
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .nav a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .nav a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .welcome-header {
+            background-color: #d4c4b7;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .welcome-header h1 {
+            color: #5d4037;
+            margin: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .profile-info {
+            margin-bottom: 30px;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .info-label {
+            font-weight: bold;
+            width: 200px;
+            color: #5d4037;
+        }
+        .info-value {
+            flex: 1;
+        }
+        .orders-section {
+            margin-top: 30px;
+        }
+        .order-card {
+            border: 1px solid #d4c4b7;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #fff;
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .order-items {
+            margin-top: 10px;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .order-item:hover {
+            background-color: #f9f5f2;
+        }
+        .status-pending {
+            color: #ffc107;
+        }
+        .status-completed {
+            color: #28a745;
+        }
+        .status-cancelled {
+            color: #dc3545;
+        }
+        .no-data {
+            color: #6c757d;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            float: right;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+        h2 {
+            color: #5d4037;
+            border-bottom: 2px solid #d4c4b7;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-header">
+        <h1>Профиль</h1>
+    </div>
+
+    <div class="nav">
+        <div class="nav-container">
+            <a href="/home.html">Главная</a>
+            <a href="/services.html">Услуги</a>
+            <a href="/contacts.html">Контакты</a>
+            <a href="/profile.html" class="active">Профиль</a>
+            <a href="/cart.html">Корзина</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Личный кабинет</h2>
+                <button class="logout-btn" onclick="logout()">Выйти</button>
+            </div>
+
+            <div class="profile-info">
+                <h2>Информация о пользователе</h2>
+                <div class="info-row">
+                    <div class="info-label">ФИО:</div>
+                    <div class="info-value" id="fullName">Загрузка...</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Email:</div>
+                    <div class="info-value" id="email">Загрузка...</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Телефон:</div>
+                    <div class="info-value" id="phone">Загрузка...</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Дата регистрации:</div>
+                    <div class="info-value" id="registeredAt">Загрузка...</div>
+                </div>
+            </div>
+
+            <div class="orders-section">
+                <h2>История заказов</h2>
+                <div id="ordersList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Проверяем авторизацию при загрузке страницы
+        window.onload = function() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/index.html';
+                return;
+            }
+            loadProfile();
+        };
+
+        async function loadProfile() {
+            try {
+                const token = localStorage.getItem('token');
+                console.log('Загруженный токен:', token);
+
+                const response = await fetch('/api/auth/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                console.log('Статус ответа:', response.status);
+                const responseText = await response.text();
+                console.log('Ответ сервера:', responseText);
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        console.log('Ошибка авторизации, перенаправление на страницу входа');
+                        localStorage.removeItem('token');
+                        window.location.href = '/index.html';
+                        return;
+                    }
+                    throw new Error('Ошибка при загрузке профиля');
+                }
+
+                const data = JSON.parse(responseText);
+                console.log('Данные профиля:', data);
+                displayProfile(data);
+            } catch (error) {
+                console.error('Ошибка при загрузке профиля:', error);
+                alert('Ошибка при загрузке данных профиля: ' + error.message);
+            }
+        }
+
+        function displayProfile(data) {
+            document.getElementById('fullName').textContent = data.fullName || 'Не указано';
+            document.getElementById('email').textContent = data.email;
+            document.getElementById('phone').textContent = data.phoneNumber || 'Не указано';
+            document.getElementById('registeredAt').textContent = new Date(data.registeredAt).toLocaleString();
+
+            const ordersListElement = document.getElementById('ordersList');
+            if (!data.orders || data.orders.length === 0) {
+                ordersListElement.innerHTML = '<div class="no-data">У вас пока нет заказов</div>';
+                return;
+            }
+
+            ordersListElement.innerHTML = data.orders
+                .sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate))
+                .map(order => `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <strong>Заказ #${order.orderId}</strong><br>
+                                ${new Date(order.orderDate).toLocaleString()}
+                            </div>
+                            <div>
+                                <span class="status-${order.status.toLowerCase()}">${getStatusText(order.status)}</span><br>
+                                <strong>${order.totalAmount.toFixed(2)} ₽</strong>
+                            </div>
+                        </div>
+                        <div class="order-items">
+                            ${order.items.map(item => `
+                                <div class="order-item">
+                                    <div>${item.serviceTitle} x${item.quantity}</div>
+                                    <div>${item.totalPrice.toFixed(2)} ₽</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        function getStatusText(status) {
+            switch (status.toLowerCase()) {
+                case 'pending':
+                    return 'В обработке';
+                case 'completed':
+                    return 'Завершен';
+                case 'cancelled':
+                    return 'Отменен';
+                default:
+                    return status;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/index.html';
+        }
+    </script>
+</body>
+</html> 

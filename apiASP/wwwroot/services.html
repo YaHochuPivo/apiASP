@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Услуги</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .welcome-header {
+            background-color: #d4c4b7;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .welcome-header h1 {
+            color: #5d4037;
+            margin: 0;
+        }
+        .nav {
+            background-color: #c19a6b;
+            padding: 15px 0;
+            margin-bottom: 20px;
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .nav a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .nav a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .service-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+        .service-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #5d4037;
+            margin-bottom: 10px;
+        }
+        .service-description {
+            color: #555;
+            margin: 10px 0;
+        }
+        .service-details {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #d4c4b7;
+        }
+        .service-duration, .service-price {
+            color: #5d4037;
+            font-size: 0.9em;
+        }
+        .service-psychologist {
+            color: #8b4513;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        .add-to-cart-btn {
+            background-color: #8b4513;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        .add-to-cart-btn:hover {
+            background-color: #a0522d;
+        }
+        .loading-message {
+            text-align: center;
+            padding: 20px;
+            color: #5d4037;
+        }
+        .error-message {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-header">
+        <h1>Наши услуги</h1>
+    </div>
+
+    <div class="nav">
+        <div class="nav-container">
+            <a href="/home.html">Главная</a>
+            <a href="/services.html" class="active">Услуги</a>
+            <a href="/contacts.html">Контакты</a>
+            <a href="/profile.html">Профиль</a>
+            <a href="/cart.html">Корзина</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div id="servicesContainer">
+                <div class="services-grid">
+                    <div class="loading-message">Загрузка списка услуг...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        // Проверяем авторизацию при загрузке страницы
+        window.onload = function() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/index.html';
+                return;
+            }
+            loadServices();
+        };
+
+        async function loadServices() {
+            try {
+                console.log('Загрузка списка услуг...');
+                const response = await fetch(`${API_URL}/api/service`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const services = await response.json();
+                console.log('Получены данные услуг:', services);
+
+                const container = document.querySelector('.services-grid');
+                if (!services || services.length === 0) {
+                    container.innerHTML = '<p class="error-message">В данный момент нет доступных услуг</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                services.forEach(service => {
+                    const card = document.createElement('div');
+                    card.className = 'service-card';
+                    
+                    card.innerHTML = `
+                        <h3 class="service-title">${service.title}</h3>
+                        <p class="service-description">${service.description || 'Описание услуги отсутствует'}</p>
+                        <div class="service-details">
+                            <span class="service-duration">Длительность: ${service.durationMinutes} мин.</span>
+                            <span class="service-price">Цена: ${service.price.toFixed(2)} ₽</span>
+                        </div>
+                        <p class="service-psychologist">
+                            Специалист: ${service.psychologist ? 
+                                `${service.psychologist.fullName} (${service.psychologist.specialization})` : 
+                                'Специалист не назначен'}
+                        </p>
+                        <button class="add-to-cart-btn" onclick="addToCart(${JSON.stringify(service).replace(/"/g, '&quot;')})">
+                            В корзину
+                        </button>
+                    `;
+
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Ошибка при загрузке услуг:', error);
+                const container = document.querySelector('.services-grid');
+                container.innerHTML = `<p class="error-message">Произошла ошибка при загрузке списка услуг: ${error.message}</p>`;
+            }
+        }
+
+        function addToCart(service) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Для добавления услуг в корзину необходимо авторизоваться');
+                window.location.href = '/index.html';
+                return;
+            }
+
+            cart.push({
+                id: service.serviceId,
+                name: service.title,
+                price: service.price,
+                quantity: 1,
+                psychologist: service.psychologist ? service.psychologist.fullName : 'Не назначен'
+            });
+            
+            localStorage.setItem('cart', JSON.stringify(cart));
+            alert('Услуга добавлена в корзину');
+        }
+    </script>
+</body>
+</html> 

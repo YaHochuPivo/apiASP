@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Корзина</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .welcome-header {
+            background-color: #d4c4b7;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .welcome-header h1 {
+            color: #5d4037;
+            margin: 0;
+        }
+        .nav {
+            background-color: #c19a6b;
+            padding: 15px 0;
+            margin-bottom: 20px;
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .nav a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .nav a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #fff8dc;
+            border-radius: 8px;
+            border: 1px solid #d4c4b7;
+        }
+        .cart-item-name {
+            flex: 1;
+            font-weight: bold;
+            color: #5d4037;
+        }
+        .cart-item-price {
+            margin: 0 20px;
+            color: #5d4037;
+        }
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .quantity-btn {
+            background-color: #c19a6b;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .quantity-btn:hover {
+            background-color: #a0815a;
+        }
+        .cart-total {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff8dc;
+            border-radius: 8px;
+            border: 1px solid #d4c4b7;
+            text-align: right;
+        }
+        .cart-total h3 {
+            color: #5d4037;
+            margin: 0;
+        }
+        .checkout-btn {
+            background-color: #c19a6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        .checkout-btn:hover {
+            background-color: #a0815a;
+        }
+        .empty-cart {
+            text-align: center;
+            padding: 40px;
+            color: #5d4037;
+        }
+        .remove-btn {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+        .remove-btn:hover {
+            background-color: #b71c1c;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-header">
+        <h1>Корзина</h1>
+    </div>
+
+    <div class="nav">
+        <div class="nav-container">
+            <a href="/home.html">Главная</a>
+            <a href="/services.html">Услуги</a>
+            <a href="/contacts.html">Контакты</a>
+            <a href="/profile.html">Профиль</a>
+            <a href="/cart.html" class="active">Корзина</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div id="cart-items">
+                <!-- Здесь будут отображаться товары из корзины -->
+            </div>
+            <div id="cart-total" class="cart-total" style="display: none;">
+                <h3>Итого: <span id="total-amount">0</span> ₽</h3>
+                <button class="checkout-btn" onclick="checkout()">Оформить заказ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Проверяем авторизацию при загрузке страницы
+        window.onload = function() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/index.html';
+                return;
+            }
+            loadCart();
+        };
+
+        function loadCart() {
+            const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+            const cartContainer = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+            
+            if (cartItems.length === 0) {
+                cartContainer.innerHTML = '<div class="empty-cart"><h2>Корзина пуста</h2></div>';
+                cartTotal.style.display = 'none';
+                return;
+            }
+
+            let total = 0;
+            cartContainer.innerHTML = '';
+            
+            cartItems.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                
+                const itemElement = document.createElement('div');
+                itemElement.className = 'cart-item';
+                itemElement.innerHTML = `
+                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-price">${item.price} ₽</div>
+                    <div class="cart-item-quantity">
+                        <button class="quantity-btn" onclick="updateQuantity(${index}, -1)">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="quantity-btn" onclick="updateQuantity(${index}, 1)">+</button>
+                        <button class="remove-btn" onclick="removeItem(${index})">Удалить</button>
+                    </div>
+                `;
+                cartContainer.appendChild(itemElement);
+            });
+
+            document.getElementById('total-amount').textContent = total;
+            cartTotal.style.display = 'block';
+        }
+
+        function updateQuantity(index, change) {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if (cart[index]) {
+                cart[index].quantity = Math.max(1, cart[index].quantity + change);
+                localStorage.setItem('cart', JSON.stringify(cart));
+                loadCart();
+            }
+        }
+
+        function removeItem(index) {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            loadCart();
+        }
+
+        async function checkout() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Необходимо авторизоваться');
+                window.location.href = '/index.html';
+                return;
+            }
+
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if (cart.length === 0) {
+                alert('Корзина пуста');
+                return;
+            }
+
+            try {
+                // Группируем товары по ID и подсчитываем количество
+                const groupedItems = {};
+                cart.forEach(item => {
+                    if (groupedItems[item.id]) {
+                        groupedItems[item.id] += item.quantity;
+                    } else {
+                        groupedItems[item.id] = item.quantity;
+                    }
+                });
+
+                // Формируем массив для запроса
+                const items = Object.entries(groupedItems).map(([id, quantity]) => ({
+                    serviceId: parseInt(id),
+                    quantity: quantity
+                }));
+
+                const response = await fetch('/api/order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ items })
+                });
+
+                if (response.ok) {
+                    alert('Заказ успешно оформлен');
+                    localStorage.removeItem('cart');
+                    loadCart();
+                } else if (response.status === 401) {
+                    if (response.headers.get('Token-Expired')) {
+                        alert('Сессия истекла. Пожалуйста, войдите снова.');
+                        localStorage.removeItem('token');
+                        window.location.href = '/index.html';
+                    } else {
+                        alert('Ошибка авторизации');
+                    }
+                } else {
+                    const error = await response.text();
+                    alert(`Ошибка при оформлении заказа: ${error}`);
+                }
+            } catch (error) {
+                console.error('Ошибка при оформлении заказа:', error);
+                alert('Произошла ошибка при оформлении заказа');
+            }
+        }
+    </script>
+</body>
+</html> 

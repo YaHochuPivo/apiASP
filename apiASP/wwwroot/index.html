@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        .debug-info {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Регистрация</h2>
+        <form id="registerForm" onsubmit="register(event)">
+            <div class="form-group">
+                <label for="regFullName">ФИО:</label>
+                <input type="text" id="regFullName" required>
+            </div>
+            <div class="form-group">
+                <label for="regEmail">Email:</label>
+                <input type="email" id="regEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="regPassword">Пароль:</label>
+                <input type="password" id="regPassword" required>
+            </div>
+            <div class="form-group">
+                <label for="regPhone">Телефон:</label>
+                <input type="tel" id="regPhone">
+            </div>
+            <button type="submit">Зарегистрироваться</button>
+            <div id="registerError" class="response error"></div>
+        </form>
+
+        <h2>Вход</h2>
+        <form id="loginForm" onsubmit="login(event)">
+            <div class="form-group">
+                <label for="loginEmail">Email:</label>
+                <input type="email" id="loginEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Пароль:</label>
+                <input type="password" id="loginPassword" required>
+            </div>
+            <button type="submit">Войти</button>
+            <button type="button" onclick="updateTestPassword()">Обновить тестовый пароль</button>
+            <div id="loginError" class="response error"></div>
+        </form>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+        console.log('API URL:', API_URL);
+
+        // Проверяем авторизацию при загрузке страницы
+        window.onload = function() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                window.location.href = '/home.html';
+            }
+        };
+
+        async function register(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const fullName = document.getElementById('regFullName').value;
+            const phoneNumber = document.getElementById('regPhone').value;
+
+            try {
+                console.log('Попытка регистрации...');
+                const response = await fetch(`${API_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                        fullName: fullName,
+                        phoneNumber: phoneNumber
+                    })
+                });
+
+                console.log('Статус ответа:', response.status);
+                const data = await response.text();
+                console.log('Ответ сервера:', data);
+
+                if (!response.ok) {
+                    let errorMessage = 'Ошибка при регистрации';
+                    try {
+                        const errorData = JSON.parse(data);
+                        errorMessage = errorData.message || errorMessage;
+                    } catch (e) {
+                        console.error('Ошибка при разборе ответа:', e);
+                    }
+                    throw new Error(errorMessage);
+                }
+
+                const result = JSON.parse(data);
+                console.log('Успешная регистрация:', result);
+
+                localStorage.setItem('token', result.token);
+                window.location.href = '/home.html';
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showError('registerError', error.message || 'Ошибка при регистрации');
+            }
+        }
+
+        async function login(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                console.log('Попытка входа...');
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+
+                console.log('Статус ответа:', response.status);
+                const data = await response.text();
+                console.log('Ответ сервера:', data);
+
+                if (!response.ok) {
+                    let errorMessage = 'Ошибка при входе';
+                    try {
+                        const errorData = JSON.parse(data);
+                        errorMessage = errorData.message || errorMessage;
+                    } catch (e) {
+                        console.error('Ошибка при разборе ответа:', e);
+                    }
+                    throw new Error(errorMessage);
+                }
+
+                const result = JSON.parse(data);
+                console.log('Успешный вход:', result);
+
+                localStorage.setItem('token', result.token);
+                window.location.href = '/home.html';
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showError('loginError', error.message || 'Неверный email или пароль');
+            }
+        }
+
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+        }
+
+        async function updateTestPassword() {
+            try {
+                console.log('Обновление тестового пароля...');
+                const response = await fetch(`${API_URL}/api/auth/updatetestpassword`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('Статус ответа:', response.status);
+                const data = await response.text();
+                console.log('Ответ сервера:', data);
+
+                if (!response.ok) {
+                    throw new Error('Ошибка при обновлении пароля');
+                }
+
+                alert('Тестовый пароль успешно обновлен на "123456"');
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Ошибка при обновлении пароля: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная страница</title>
+    <style>
+        :root {
+            --primary-color: #D2B48C;       /* Основной бежевый */
+            --primary-dark: #BC8F5F;        /* Темный бежевый для кнопок и акцентов */
+            --primary-light: #F5DEB3;       /* Светлый бежевый для фона */
+            --secondary-color: #8B4513;     /* Коричневый для текста */
+            --accent-color: #DEB887;        /* Акцентный бежевый */
+            --background-light: #FFF8DC;    /* Очень светлый бежевый для фона */
+            --error-color: #CD5C5C;         /* Красный для кнопки выхода */
+            --error-hover: #B22222;         /* Темно-красный при наведении */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(139, 69, 19, 0.1);
+        }
+
+        .nav {
+            background-color: #c19a6b;
+            padding: 15px 0;
+            margin-bottom: 20px;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .welcome-message, .user-info, .profile-card {
+            background-color: #FFFFFF;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(139, 69, 19, 0.1);
+            margin-bottom: 20px;
+            border: 1px solid var(--primary-light);
+        }
+
+        .welcome-message h2, .profile-card h2 {
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .logout-btn {
+            background-color: var(--error-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: var(--error-hover);
+        }
+
+        .content {
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .profile-section {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .profile-card {
+            position: relative;
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-details {
+            margin-top: 20px;
+        }
+
+        .profile-details p {
+            margin: 10px 0;
+            padding: 15px;
+            background-color: var(--background-light);
+            border-radius: 4px;
+            border: 1px solid var(--primary-light);
+        }
+
+        /* Стили для списков */
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--primary-light);
+        }
+
+        ul li:last-child {
+            border-bottom: none;
+        }
+
+        /* Стили для ссылок */
+        a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: var(--primary-dark);
+        }
+
+        /* Дополнительные стили для контактной информации */
+        .contact-info p {
+            padding: 10px;
+            background-color: var(--background-light);
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        /* Стили для кнопок */
+        button {
+            background-color: var(--primary-dark);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--accent-color);
+        }
+
+        /* Стили для секции психологов */
+        .psychologists-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .psychologist-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .psychologist-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .psychologist-photo {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .psychologist-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        /* Специальные стили для позиционирования фотографий */
+        .psychologist-photo img[data-psychologist-id="2"] {
+            object-position: top center;
+        }
+
+        .psychologist-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .psychologist-specialization {
+            color: #666;
+            font-style: italic;
+            margin: 5px 0;
+        }
+
+        .psychologist-experience {
+            color: #444;
+            margin: 5px 0;
+        }
+
+        .psychologist-bio {
+            color: #555;
+            font-size: 0.9em;
+            line-height: 1.4;
+            margin: 10px 0;
+        }
+
+        .psychologist-rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            color: #ffc107;
+        }
+
+        .rating-stars {
+            color: #ffc107;
+            font-size: 1.2em;
+        }
+
+        .rating-info {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* Стили для отзывов */
+        .reviews-section {
+            margin-top: 30px;
+        }
+
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .review-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .review-author {
+            font-weight: bold;
+            color: #5d4037;
+        }
+
+        .review-date {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .review-rating {
+            color: #ffc107;
+            margin: 10px 0;
+        }
+
+        .review-comment {
+            color: #555;
+            line-height: 1.4;
+        }
+
+        .review-psychologist {
+            margin-top: 10px;
+            font-style: italic;
+            color: #8b4513;
+        }
+
+        .add-review-btn {
+            background-color: #c19a6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .add-review-btn:hover {
+            background-color: #a0815a;
+        }
+
+        .review-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .review-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #5d4037;
+        }
+
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d4c4b7;
+            border-radius: 4px;
+        }
+
+        .rating-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .rating-btn {
+            background: none;
+            border: 1px solid #ffc107;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #ffc107;
+        }
+
+        .rating-btn.active {
+            background-color: #ffc107;
+            color: white;
+        }
+
+        .loading-message {
+            text-align: center;
+            padding: 20px;
+            color: var(--secondary-color);
+        }
+
+        .error-message {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .psychologists-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Стили для услуг */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .service-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+
+        .service-description {
+            color: #555;
+            margin: 10px 0;
+        }
+
+        .service-details {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--primary-light);
+        }
+
+        .service-duration, .service-price {
+            color: var(--secondary-color);
+            font-size: 0.9em;
+        }
+
+        .service-psychologist {
+            color: var(--primary-dark);
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        /* Стили для корзины */
+        .cart-count {
+            background-color: var(--error-color);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+
+        .cart-items {
+            margin-bottom: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .cart-item-info {
+            flex-grow: 1;
+        }
+
+        .cart-item-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-price {
+            color: var(--secondary-color);
+        }
+
+        .cart-item-remove {
+            background-color: var(--error-color);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .cart-item-remove:hover {
+            background-color: var(--error-hover);
+        }
+
+        .cart-summary {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .cart-total {
+            margin-bottom: 20px;
+        }
+
+        .cart-total h3 {
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+
+        .checkout-btn {
+            background-color: var(--primary-dark);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1em;
+        }
+
+        .checkout-btn:hover {
+            background-color: var(--accent-color);
+        }
+
+        .add-to-cart-btn {
+            background-color: var(--primary-dark);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: var(--accent-color);
+        }
+
+        .welcome-header {
+            background-color: #d4c4b7;
+            padding: 40px 0;
+            text-align: center;
+            margin-bottom: 20px;
+            background-image: linear-gradient(to right, #d4c4b7, #c19a6b);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .welcome-header h1 {
+            color: #5d4037;
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+        }
+        .welcome-subheader {
+            color: #8b4513;
+            margin-top: 10px;
+            font-size: 1.2em;
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-header">
+        <h1>Психологическая помощь</h1>
+        <div class="welcome-subheader">Профессиональная поддержка для вашего благополучия</div>
+    </div>
+
+    <div class="nav">
+        <div class="nav-container">
+            <a href="/home.html" class="active">Главная</a>
+            <a href="/services.html">Услуги</a>
+            <a href="/contacts.html">Контакты</a>
+            <a href="/profile.html">Профиль</a>
+            <a href="/cart.html">Корзина</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Вкладка Главная -->
+        <div id="home" class="content active">
+            <div class="welcome-message">
+                <h2>Добро пожаловать на наш сайт!</h2>
+                <p>Мы рады приветствовать вас на нашей платформе психологической помощи. 
+                   Здесь вы можете найти профессиональную поддержку и консультации опытных специалистов.</p>
+                <p>Для вашего удобства мы предлагаем:</p>
+                <ul>
+                    <li>Индивидуальный подход к каждому клиенту</li>
+                    <li>Гибкий график консультаций</li>
+                    <li>Онлайн и офлайн формат работы</li>
+                    <li>Конфиденциальность и профессионализм</li>
+                </ul>
+            </div>
+
+            <div class="welcome-message">
+                <h2>Наши специалисты</h2>
+                <div id="psychologistsContainer">
+                    <div class="psychologists-grid">
+                        <div class="loading-message">Загрузка информации о специалистах...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="welcome-message">
+                <h2>Отзывы наших клиентов</h2>
+                <div id="reviewsContainer">
+                    <div class="reviews-grid">
+                        <div class="loading-message">Загрузка отзывов...</div>
+                    </div>
+                    <button class="add-review-btn" onclick="showReviewForm()">Оставить отзыв</button>
+                    <div id="reviewForm" class="review-form">
+                        <h3>Новый отзыв</h3>
+                        <div class="form-group">
+                            <label for="psychologistSelect">Выберите специалиста:</label>
+                            <select id="psychologistSelect" required>
+                                <option value="">Выберите специалиста</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Оценка:</label>
+                            <div class="rating-group">
+                                <button class="rating-btn" onclick="setRating(1)">1</button>
+                                <button class="rating-btn" onclick="setRating(2)">2</button>
+                                <button class="rating-btn" onclick="setRating(3)">3</button>
+                                <button class="rating-btn" onclick="setRating(4)">4</button>
+                                <button class="rating-btn" onclick="setRating(5)">5</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="reviewComment">Комментарий:</label>
+                            <textarea id="reviewComment" rows="4" required></textarea>
+                        </div>
+                        <button class="add-review-btn" onclick="submitReview()">Отправить отзыв</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка Услуги -->
+        <div id="services" class="content">
+            <div class="welcome-message">
+                <h2>Наши услуги</h2>
+                <p>Мы предлагаем широкий спектр психологических услуг для решения различных жизненных ситуаций.</p>
+                <div id="servicesContainer">
+                    <div class="services-grid">
+                        <div class="loading-message">Загрузка списка услуг...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка Контакты -->
+        <div id="contacts" class="content">
+            <div class="welcome-message contact-info">
+                <h2>Контактная информация</h2>
+                <p>Свяжитесь с нами удобным для вас способом:</p>
+                <p><strong>Адрес:</strong> г. Москва, ул. Примерная, д. 123</p>
+                <p><strong>Телефон:</strong> +7 (999) 123-45-67</p>
+                <p><strong>Email:</strong> info@example.com</p>
+                <p><strong>Время работы:</strong> Пн-Пт: 9:00 - 20:00</p>
+            </div>
+        </div>
+
+        <!-- Вкладка Профиль -->
+        <div id="profile" class="content">
+            <div class="profile-section">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <h2>Личный кабинет</h2>
+                        <button class="logout-btn" onclick="logout()">Выйти</button>
+                    </div>
+                    <p>Вы успешно авторизовались в системе.</p>
+                    <div class="profile-details" id="userDetails">
+                        Загрузка информации...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка Корзина -->
+        <div id="cart" class="content">
+            <div class="welcome-message">
+                <h2>Корзина</h2>
+                <div id="cartContainer">
+                    <div class="cart-items"></div>
+                    <div class="cart-summary">
+                        <div class="cart-total">
+                            <h3>Итого:</h3>
+                            <p>Сумма: <span id="cartTotal">0</span> ₽</p>
+                        </div>
+                        <button class="checkout-btn" onclick="checkout()">Оформить заказ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+        console.log('API URL:', API_URL);
+
+        async function loadPsychologists() {
+            try {
+                console.log('Загрузка списка психологов...');
+                const response = await fetch(`${API_URL}/api/psychologist`);
+                
+                if (!response.ok) {
+                    console.error('Ошибка при загрузке психологов:', response.status);
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const psychologists = await response.json();
+                console.log('Получены данные психологов:', psychologists);
+
+                const container = document.querySelector('.psychologists-grid');
+                if (!container) {
+                    console.error('Контейнер для психологов не найден');
+                    return;
+                }
+
+                if (!psychologists || psychologists.length === 0) {
+                    container.innerHTML = '<p class="error-message">В данный момент нет доступных специалистов</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                psychologists.forEach(psych => {
+                    const card = document.createElement('div');
+                    card.className = 'psychologist-card';
+                    
+                    const photoContainer = document.createElement('div');
+                    photoContainer.className = 'psychologist-photo';
+                    const img = document.createElement('img');
+                    img.src = psych.photoUrl || 'images/default-avatar.png';
+                    img.alt = psych.fullName;
+                    img.setAttribute('data-psychologist-id', psych.psychologistId);
+                    img.onerror = function() {
+                        this.src = 'images/default-avatar.png';
+                    };
+                    photoContainer.appendChild(img);
+
+                    const name = document.createElement('h3');
+                    name.className = 'psychologist-name';
+                    name.textContent = psych.fullName;
+
+                    const specialization = document.createElement('p');
+                    specialization.className = 'psychologist-specialization';
+                    specialization.textContent = psych.specialization;
+
+                    const experience = document.createElement('p');
+                    experience.className = 'psychologist-experience';
+                    experience.textContent = `Опыт работы: ${psych.yearsOfExperience} ${getYearsWord(psych.yearsOfExperience)}`;
+
+                    const rating = document.createElement('div');
+                    rating.className = 'psychologist-rating';
+                    
+                    const stars = document.createElement('div');
+                    stars.className = 'rating-stars';
+                    if (psych.averageRating > 0) {
+                        const fullStars = Math.floor(psych.averageRating);
+                        const hasHalfStar = psych.averageRating % 1 >= 0.5;
+                        stars.textContent = '★'.repeat(fullStars) + (hasHalfStar ? '⯨' : '') + '☆'.repeat(5 - fullStars - (hasHalfStar ? 1 : 0));
+                    } else {
+                        stars.textContent = '☆☆☆☆☆';
+                    }
+
+                    const ratingInfo = document.createElement('div');
+                    ratingInfo.className = 'rating-info';
+                    if (psych.reviewsCount > 0) {
+                        ratingInfo.textContent = `${psych.averageRating} (${psych.reviewsCount} ${getReviewsWord(psych.reviewsCount)})`;
+                    } else {
+                        ratingInfo.textContent = 'Нет отзывов';
+                    }
+
+                    rating.appendChild(stars);
+                    rating.appendChild(ratingInfo);
+
+                    const bio = document.createElement('p');
+                    bio.className = 'psychologist-bio';
+                    bio.textContent = psych.biography || psych.bio || 'Информация о специалисте будет добавлена позже';
+
+                    card.appendChild(photoContainer);
+                    card.appendChild(name);
+                    card.appendChild(specialization);
+                    card.appendChild(rating);
+                    card.appendChild(experience);
+                    card.appendChild(bio);
+
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Ошибка при загрузке психологов:', error);
+                const container = document.querySelector('.psychologists-grid');
+                if (container) {
+                    container.innerHTML = `<p class="error-message">Произошла ошибка при загрузке списка специалистов: ${error.message}</p>`;
+                }
+            }
+        }
+
+        function getYearsWord(years) {
+            const lastDigit = years % 10;
+            const lastTwoDigits = years % 100;
+
+            if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+                return 'лет';
+            }
+
+            switch (lastDigit) {
+                case 1:
+                    return 'год';
+                case 2:
+                case 3:
+                case 4:
+                    return 'года';
+                default:
+                    return 'лет';
+            }
+        }
+
+        function getReviewsWord(count) {
+            const lastDigit = count % 10;
+            const lastTwoDigits = count % 100;
+
+            if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+                return 'отзывов';
+            }
+
+            switch (lastDigit) {
+                case 1:
+                    return 'отзыв';
+                case 2:
+                case 3:
+                case 4:
+                    return 'отзыва';
+                default:
+                    return 'отзывов';
+            }
+        }
+
+        // Загрузка информации о пользователе
+        async function loadUserInfo() {
+            const token = localStorage.getItem('token');
+            const userInfo = parseJwt(token);
+            
+            const userDetails = document.getElementById('userDetails');
+            userDetails.innerHTML = `
+                <p><strong>ФИО:</strong> ${userInfo.name || 'Не указано'}</p>
+                <p><strong>Email:</strong> ${userInfo.email || 'Не указано'}</p>
+                <p><strong>Телефон:</strong> ${userInfo.phoneNumber || 'Не указано'}</p>
+            `;
+        }
+
+        // Функция для разбора JWT токена
+        function parseJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) {
+                return {};
+            }
+        }
+
+        // Функция выхода
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/index.html';
+        }
+
+        // Функция переключения вкладок
+        function showTab(tabId, element) {
+            // Скрываем все вкладки
+            document.querySelectorAll('.content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Показываем выбранную вкладку
+            document.getElementById(tabId).classList.add('active');
+            
+            // Обновляем активную ссылку в меню
+            document.querySelectorAll('.nav a').forEach(link => {
+                link.classList.remove('active');
+            });
+            element.classList.add('active');
+        }
+
+        async function loadServices() {
+            try {
+                console.log('Загрузка списка услуг...');
+                const response = await fetch(`${API_URL}/api/service`);
+                
+                if (!response.ok) {
+                    console.error('Ошибка при загрузке услуг:', response.status);
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const services = await response.json();
+                console.log('Получены данные услуг:', services);
+
+                const container = document.querySelector('.services-grid');
+                if (!container) {
+                    console.error('Контейнер для услуг не найден');
+                    return;
+                }
+
+                if (!services || services.length === 0) {
+                    container.innerHTML = '<p class="error-message">В данный момент нет доступных услуг</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                services.forEach(service => {
+                    console.log('Обработка услуги:', service);
+
+                    const card = document.createElement('div');
+                    card.className = 'service-card';
+                    
+                    const title = document.createElement('h3');
+                    title.className = 'service-title';
+                    title.textContent = service.title;
+
+                    const description = document.createElement('p');
+                    description.className = 'service-description';
+                    description.textContent = service.description || 'Описание услуги отсутствует';
+
+                    const details = document.createElement('div');
+                    details.className = 'service-details';
+
+                    const duration = document.createElement('span');
+                    duration.className = 'service-duration';
+                    duration.textContent = `Длительность: ${service.durationMinutes} мин.`;
+
+                    const price = document.createElement('span');
+                    price.className = 'service-price';
+                    price.textContent = `Цена: ${service.price.toFixed(2)} ₽`;
+
+                    details.appendChild(duration);
+                    details.appendChild(price);
+
+                    const psychologist = document.createElement('p');
+                    psychologist.className = 'service-psychologist';
+                    if (service.psychologist) {
+                        psychologist.textContent = `Специалист: ${service.psychologist.fullName} (${service.psychologist.specialization})`;
+                    } else if (service.psychologistId) {
+                        psychologist.textContent = 'Загрузка информации о специалисте...';
+                    } else {
+                        psychologist.textContent = 'Специалист не назначен';
+                    }
+
+                    const addToCartBtn = document.createElement('button');
+                    addToCartBtn.className = 'add-to-cart-btn';
+                    addToCartBtn.textContent = 'В корзину';
+                    addToCartBtn.onclick = () => addToCart(service);
+
+                    card.appendChild(title);
+                    card.appendChild(description);
+                    card.appendChild(details);
+                    card.appendChild(psychologist);
+                    card.appendChild(addToCartBtn);
+
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Ошибка при загрузке услуг:', error);
+                const container = document.querySelector('.services-grid');
+                if (container) {
+                    container.innerHTML = `<p class="error-message">Произошла ошибка при загрузке списка услуг: ${error.message}</p>`;
+                }
+            }
+        }
+
+        // Функции для работы с корзиной
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        function updateCartCount() {
+            const cartCount = document.getElementById('cartCount');
+            if (cart.length > 0) {
+                cartCount.textContent = cart.length;
+                cartCount.style.display = 'inline';
+            } else {
+                cartCount.style.display = 'none';
+            }
+        }
+
+        function addToCart(service) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Для добавления услуг в корзину необходимо авторизоваться');
+                window.location.href = '/index.html';
+                return;
+            }
+
+            console.log('Добавление услуги в корзину:', service);
+            
+            cart.push({
+                id: service.serviceId,
+                title: service.title,
+                price: service.price,
+                psychologist: service.psychologist ? service.psychologist.fullName : 'Не назначен'
+            });
+            
+            console.log('Текущая корзина:', cart);
+            
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            updateCartDisplay();
+            alert('Услуга добавлена в корзину');
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            updateCartDisplay();
+        }
+
+        function updateCartDisplay() {
+            const cartItems = document.querySelector('.cart-items');
+            const cartTotal = document.getElementById('cartTotal');
+            
+            if (!cartItems) return;
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p>Корзина пуста</p>';
+                cartTotal.textContent = '0';
+                return;
+            }
+
+            cartItems.innerHTML = '';
+            let total = 0;
+
+            cart.forEach((item, index) => {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+
+                const itemInfo = document.createElement('div');
+                itemInfo.className = 'cart-item-info';
+
+                const title = document.createElement('div');
+                title.className = 'cart-item-title';
+                title.textContent = item.title;
+
+                const psychologist = document.createElement('div');
+                psychologist.textContent = `Специалист: ${item.psychologist}`;
+
+                const price = document.createElement('div');
+                price.className = 'cart-item-price';
+                price.textContent = `${item.price} ₽`;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'cart-item-remove';
+                removeBtn.textContent = 'Удалить';
+                removeBtn.onclick = () => removeFromCart(index);
+
+                itemInfo.appendChild(title);
+                itemInfo.appendChild(psychologist);
+                itemInfo.appendChild(price);
+
+                cartItem.appendChild(itemInfo);
+                cartItem.appendChild(removeBtn);
+
+                cartItems.appendChild(cartItem);
+                total += item.price;
+            });
+
+            cartTotal.textContent = total.toFixed(2);
+        }
+
+        async function checkout() {
+            if (cart.length === 0) {
+                alert('Корзина пуста');
+                return;
+            }
+
+            let token = localStorage.getItem('token');
+            if (!token) {
+                alert('Для оформления заказа необходимо авторизоваться');
+                window.location.href = '/index.html';
+                return;
+            }
+
+            // Убедимся, что токен начинается с Bearer
+            token = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+            
+            try {
+                console.log('Начало оформления заказа. Текущая корзина:', cart);
+
+                // Группируем товары по ID и подсчитываем количество
+                const groupedItems = {};
+                cart.forEach(item => {
+                    const serviceId = parseInt(item.id);
+                    if (!groupedItems[serviceId]) {
+                        groupedItems[serviceId] = {
+                            serviceId: serviceId,
+                            quantity: 0
+                        };
+                    }
+                    groupedItems[serviceId].quantity += 1;
+                });
+
+                // Создаем массив элементов заказа
+                const items = Object.values(groupedItems);
+                console.log('Сгруппированные элементы:', items);
+
+                // Формируем запрос
+                const orderRequest = { items };
+                console.log('JSON заказа:', JSON.stringify(orderRequest));
+
+                const response = await fetch(`${API_URL}/api/order`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
+                    body: JSON.stringify(orderRequest)
+                });
+
+                console.log('Статус ответа:', response.status);
+                
+                // Проверяем, не истек ли токен
+                if (response.headers.get('Token-Expired')) {
+                    localStorage.removeItem('token');
+                    alert('Ваша сессия истекла. Пожалуйста, войдите снова.');
+                    window.location.href = '/index.html';
+                    return;
+                }
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Ответ сервера при ошибке:', errorText);
+                    let errorMessage = 'Ошибка при оформлении заказа';
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.message || errorMessage;
+                    } catch (e) {
+                        console.error('Ошибка при разборе ответа:', e);
+                        errorMessage = errorText || errorMessage;
+                    }
+                    throw new Error(errorMessage);
+                }
+
+                const order = await response.json();
+                console.log('Заказ успешно создан:', order);
+
+                cart = [];
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                updateCartDisplay();
+                alert('Заказ успешно оформлен! Мы свяжемся с вами для подтверждения.');
+            } catch (error) {
+                console.error('Ошибка при оформлении заказа:', error);
+                if (error.message.includes('invalid_token')) {
+                    localStorage.removeItem('token');
+                    alert('Ошибка авторизации. Пожалуйста, войдите снова.');
+                    window.location.href = '/index.html';
+                    return;
+                }
+                alert(`Произошла ошибка при оформлении заказа: ${error.message}`);
+            }
+        }
+
+        // Загрузка отзывов
+        async function loadReviews() {
+            try {
+                console.log('Загрузка отзывов...');
+                const response = await fetch(`${API_URL}/api/review`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const reviews = await response.json();
+                console.log('Получены отзывы:', reviews);
+
+                const container = document.querySelector('.reviews-grid');
+                if (!reviews || reviews.length === 0) {
+                    container.innerHTML = '<p class="error-message">Пока нет отзывов</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                reviews.forEach(review => {
+                    const card = document.createElement('div');
+                    card.className = 'review-card';
+                    
+                    const header = document.createElement('div');
+                    header.className = 'review-header';
+                    
+                    const author = document.createElement('div');
+                    author.className = 'review-author';
+                    author.textContent = review.user.fullName;
+                    
+                    const date = document.createElement('div');
+                    date.className = 'review-date';
+                    date.textContent = new Date(review.createdAt).toLocaleDateString();
+                    
+                    header.appendChild(author);
+                    header.appendChild(date);
+
+                    const rating = document.createElement('div');
+                    rating.className = 'review-rating';
+                    rating.textContent = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+
+                    const comment = document.createElement('div');
+                    comment.className = 'review-comment';
+                    comment.textContent = review.comment;
+
+                    const psychologist = document.createElement('div');
+                    psychologist.className = 'review-psychologist';
+                    psychologist.textContent = `Специалист: ${review.psychologist.fullName} (${review.psychologist.specialization})`;
+
+                    card.appendChild(header);
+                    card.appendChild(rating);
+                    card.appendChild(comment);
+                    card.appendChild(psychologist);
+
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Ошибка при загрузке отзывов:', error);
+                const container = document.querySelector('.reviews-grid');
+                container.innerHTML = `<p class="error-message">Произошла ошибка при загрузке отзывов: ${error.message}</p>`;
+            }
+        }
+
+        let selectedRating = 0;
+
+        function showReviewForm() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Для добавления отзыва необходимо авторизоваться');
+                window.location.href = '/index.html';
+                return;
+            }
+
+            const form = document.getElementById('reviewForm');
+            form.classList.add('active');
+            loadPsychologistsForSelect();
+        }
+
+        async function loadPsychologistsForSelect() {
+            try {
+                const response = await fetch(`${API_URL}/api/psychologist`);
+                const psychologists = await response.json();
+                
+                const select = document.getElementById('psychologistSelect');
+                select.innerHTML = '<option value="">Выберите специалиста</option>';
+                
+                psychologists.forEach(psych => {
+                    const option = document.createElement('option');
+                    option.value = psych.psychologistId;
+                    option.textContent = `${psych.fullName} (${psych.specialization})`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Ошибка при загрузке списка психологов:', error);
+                alert('Не удалось загрузить список психологов');
+            }
+        }
+
+        function setRating(rating) {
+            selectedRating = rating;
+            document.querySelectorAll('.rating-btn').forEach((btn, index) => {
+                btn.classList.toggle('active', index < rating);
+            });
+        }
+
+        async function submitReview() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Необходимо авторизоваться');
+                window.location.href = '/index.html';
+                return;
+            }
+
+            const psychologistId = document.getElementById('psychologistSelect').value;
+            const comment = document.getElementById('reviewComment').value;
+
+            if (!psychologistId) {
+                alert('Выберите специалиста');
+                return;
+            }
+
+            if (!selectedRating) {
+                alert('Поставьте оценку');
+                return;
+            }
+
+            if (!comment.trim()) {
+                alert('Напишите комментарий');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/api/review`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        psychologistId: parseInt(psychologistId),
+                        rating: selectedRating,
+                        comment: comment
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка при отправке отзыва');
+                }
+
+                alert('Отзыв успешно добавлен');
+                document.getElementById('reviewForm').classList.remove('active');
+                document.getElementById('psychologistSelect').value = '';
+                document.getElementById('reviewComment').value = '';
+                selectedRating = 0;
+                document.querySelectorAll('.rating-btn').forEach(btn => btn.classList.remove('active'));
+                loadReviews();
+            } catch (error) {
+                console.error('Ошибка при отправке отзыва:', error);
+                alert('Произошла ошибка при отправке отзыва');
+            }
+        }
+
+        // Обновляем window.onload
+        window.onload = async function() {
+            try {
+                console.log('Страница загружена, начинаю инициализацию...');
+                await Promise.all([
+                    loadUserInfo(),
+                    loadPsychologists(),
+                    loadServices(),
+                    loadReviews()
+                ]);
+                updateCartCount();
+                updateCartDisplay();
+                console.log('Все данные успешно загружены');
+            } catch (error) {
+                console.error('Ошибка при инициализации страницы:', error);
+            }
+        };
+    </script>
+</body>
+</html> 
