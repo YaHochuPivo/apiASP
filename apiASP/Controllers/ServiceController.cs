@@ -27,7 +27,7 @@ namespace apiASP.Controllers
             {
                 _logger.LogInformation("Начало получения списка услуг");
 
-                // Проверяем подключение к БД
+                
                 if (!_context.Database.CanConnect())
                 {
                     _logger.LogError("Не удалось подключиться к БД");
@@ -36,11 +36,11 @@ namespace apiASP.Controllers
 
                 try
                 {
-                    // Проверяем количество услуг в базе
+                    
                     var count = await _context.Services.CountAsync();
                     _logger.LogInformation($"Текущее количество услуг в базе: {count}");
 
-                    // Загружаем все услуги с информацией о психологах
+                    
                     var services = await _context.Services
                         .Include(s => s.Psychologist)
                         .AsNoTracking()
@@ -48,20 +48,20 @@ namespace apiASP.Controllers
 
                     _logger.LogInformation($"Загружено {services.Count} услуг");
 
-                    // Если услуг меньше 3, пересоздаем тестовые данные
+                    
                     if (services.Count < 3)
                     {
                         _logger.LogInformation("Недостаточно услуг, создаем тестовые данные...");
                         await RecreateTestServices();
                         
-                        // Загружаем услуги повторно после создания тестовых данных
+                      
                         services = await _context.Services
                             .Include(s => s.Psychologist)
                             .AsNoTracking()
                             .ToListAsync();
                     }
 
-                    // Логируем каждую найденную услугу
+                    
                     foreach (var service in services)
                     {
                         _logger.LogInformation($"Услуга: ID={service.ServiceId}, " +
@@ -105,7 +105,7 @@ namespace apiASP.Controllers
         {
             try
             {
-                // Получаем существующих психологов
+                
                 var psychologists = await _context.Psychologists.ToListAsync();
                 
                 if (!psychologists.Any())
@@ -114,7 +114,7 @@ namespace apiASP.Controllers
                     return;
                 }
 
-                // Удаляем все существующие услуги
+                
                 var existingServices = await _context.Services.ToListAsync();
                 if (existingServices.Any())
                 {
@@ -123,7 +123,7 @@ namespace apiASP.Controllers
                     _logger.LogInformation("Существующие услуги удалены");
                 }
 
-                // Создаем новые услуги
+                
                 var testServices = new List<Service>
                 {
                     new Service
